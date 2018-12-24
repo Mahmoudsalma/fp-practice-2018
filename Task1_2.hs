@@ -49,6 +49,12 @@ pow' x 0 = 1
 pow' x 1 = x
 pow' x y = x * pow' x (y - 1)
 
+pow'' :: Integer -> Integer -> Integer
+pow'' x y | y == 0    = 1
+          | y == 1    = x
+          | odd y     = x * pow'' x (y - 1)
+          | otherwise = (pow'' x (y `div` 2)) * (pow'' x (y `div` 2))
+
 -- является ли данное число простым?
 isPrime :: Integer -> Bool
 isPrime x = [y | y <- [1..x], x `mod` y == 0] == [1,x]

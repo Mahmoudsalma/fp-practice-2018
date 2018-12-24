@@ -33,7 +33,8 @@ infixl 7 |*|
 replaceVar :: String -> Term -> Term -> Term
 replaceVar varName replacement expression = case expression of
         Variable v             -> if v == varName then replacement else expression
-        BinaryTerm lhv rhv opr -> BinaryTerm (replaceVar varName replacement lhv) (replaceVar varName replacement rhv) opr
+        BinaryTerm lhv rhv opr -> BinaryTerm (replaceVar varName replacement lhv) (replaceVar varName replacement rhv) 
+                                  opr
         _                      -> expression  
 
 -- Посчитать значение выражения `Term`
@@ -43,6 +44,12 @@ evaluate expression =
     case expression of
         BinaryTerm lhv rhv opr -> 
             case (left, right, opr) of
+                (IntConstant 0,    IntConstant right, Multiply) -> IntConstant 0
+                (IntConstant 1,    IntConstant right, Multiply) -> IntConstant right
+                (IntConstant left, IntConstant 0,     Multiply) -> IntConstant 0
+                (IntConstant left, IntConstant 1,     Multiply) -> IntConstant left
+                (IntConstant left, IntConstant 0,     Plus)     -> IntConstant left
+                (IntConstant 0,    IntConstant right, Plus)     -> IntConstant right
                 (IntConstant left, IntConstant right, Plus)     -> IntConstant (left + right)
                 (IntConstant left, IntConstant right, Multiply) -> IntConstant (left * right)
                 (IntConstant left, IntConstant right, Minus)    -> IntConstant (left - right)
