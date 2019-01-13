@@ -58,8 +58,15 @@ removeKey'' (Node EmptyTree right key value) = (key, value)
 removeKey'' (Node left      right key value) = removeKey'' left
 
 -- Поиск ближайшего снизу ключа относительно заданного
--- nearestLE :: Integer -> TreeMap v -> (Integer, v)
--- nearestLE _ EmptyTree = error "search key not found"
+nearestLE :: Integer -> TreeMap v -> (Integer, v)
+nearestLE _ EmptyTree = error "search key not found"
+nearestLE i (Node left right key value) 
+        | i == key = (key, value)
+        | i <  key = nearestLE i left
+        | i >  key = case right of 
+            (Node _ rightRight _ _) -> nearestLE i rightRight
+            otherwise               -> (key, value)
+
 
 -- Построение дерева из списка пар
 treeFromList :: [(Integer, v)] -> TreeMap v
@@ -68,8 +75,17 @@ treeFromList (x:xs) = insert x (treeFromList xs)
 
 -- Построение списка пар из дерева
 listFromTree :: TreeMap v -> [(Integer, v)]
-listFromTree t = todo
+listFromTree EmptyTree = []
+listFromTree (Node left right key value) = listFromTree(left) ++ [(key, value)] ++ listFromTree(right)
 
 -- Поиск k-той порядковой статистики дерева 
 kMean :: Integer -> TreeMap v -> (Integer, v)
-kMean i t = todo
+kMean i EmptyTree = error "search key not found"
+kMean i (Node left right key value) | i == (sizeNode left) = (key, value)
+                                    | i <  (sizeNode left) = kMean i left
+                                    | i >  (sizeNode left) = kMean (i - sizeNode left - 1) right
+
+sizeNode :: TreeMap v -> Integer
+sizeNode EmptyTree                   = 0
+sizeNode (Node left right key value) = sizeNode left + sizeNode right + 1
+
